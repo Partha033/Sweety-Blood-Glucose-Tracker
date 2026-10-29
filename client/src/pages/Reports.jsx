@@ -91,24 +91,25 @@ export default function Reports() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Glucose Reports & Analysis
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#78816f]">Patterns & perspective</p>
+          <h2 className="font-serif text-4xl font-normal tracking-tight text-[#26352d] sm:text-5xl">
+            Your readings, over time
           </h2>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Accurate daily, month-to-date, and previous-month clinical calculations
+          <p className="mt-2 text-sm text-[#68736a]">
+            Look back at the small details that make up your days.
           </p>
         </div>
 
         {/* Date Selector */}
-        <div className="flex items-center space-x-2 bg-white px-3 py-2 rounded-2xl border border-rose-100 shadow-sm">
-          <Calendar className="w-4 h-4 text-rose-500" />
-          <span className="text-xs font-semibold text-slate-600">Reference Date:</span>
+        <div className="flex items-center gap-2 border-b border-[#9ca891] px-1 py-2">
+          <Calendar className="w-4 h-4 text-[#526b52]" />
+          <span className="text-xs font-medium text-[#68736a]">Look back from</span>
           <input
             type="date"
             max={getTodayDateString()}
             value={selectedDate}
             onChange={(e) => handleDateChange(e.target.value)}
-            className="text-xs font-medium text-slate-800 bg-transparent border-0 focus:ring-0 p-0 cursor-pointer"
+            className="cursor-pointer border-0 bg-transparent p-0 text-sm font-semibold text-[#34443a] focus:ring-0"
           />
         </div>
       </div>
@@ -116,7 +117,7 @@ export default function Reports() {
       {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
 
       {/* Tab Navigation */}
-      <div className="flex items-center space-x-2 border-b border-rose-100 pb-2">
+      <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-b border-[#d9d7ca]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -124,10 +125,10 @@ export default function Reports() {
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className={`inline-flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              className={`inline-flex items-center border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-rose-500 text-white shadow-sm shadow-rose-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-white"
+                  ? "border-[#526b52] text-[#405943]"
+                  : "border-transparent text-[#85877e] hover:text-[#34443a]"
               }`}
             >
               <Icon className="w-4 h-4 mr-2" />

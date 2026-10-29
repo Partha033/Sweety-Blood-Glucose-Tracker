@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { readingsApi } from "../api/readingsApi";
 import { reportsApi } from "../api/reportsApi";
-import { getTodayDateString, formatDateDisplay } from "../utils/dateUtils";
+import { getTodayDateString, formatDateDisplay, TIME_SLOTS } from "../utils/dateUtils";
 import ReportSummary from "../components/ReportSummary";
+import GlucoseUnitConverter from "../components/GlucoseUnitConverter";
 import ReadingTable from "../components/ReadingTable";
 import GlucoseReadingForm from "../components/GlucoseReadingForm";
 import ConfirmDialog from "../components/ConfirmDialog";
@@ -12,7 +13,6 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import EmptyState from "../components/EmptyState";
 import ErrorMessage from "../components/ErrorMessage";
 import {
-  Plus,
   BarChart2,
   Calendar,
   CheckCircle2,
@@ -128,47 +128,87 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Daily check-in and primary action */}
-      <section className="relative overflow-hidden rounded-[2rem] border border-rose-100 bg-white shadow-sm">
-        <div className="absolute inset-y-0 right-0 hidden w-2/5 bg-gradient-to-br from-rose-50 via-pink-50 to-violet-50 md:block" />
-        <div className="relative flex flex-col gap-7 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-semibold tracking-wide text-rose-700">
-              <Calendar className="h-3.5 w-3.5" />
+      <section className="overflow-hidden border-y border-[#d9d7ca] bg-[#ebece4]">
+        <div className="grid gap-8 px-6 py-8 sm:px-9 sm:py-10 lg:grid-cols-[1fr_340px] lg:items-center lg:px-12">
+          <div className="max-w-2xl">
+            <div className="mb-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.14em] text-[#6d7868]">
+              <span className="h-px w-8 bg-[#78866f]" />
               {formatDateDisplay(today)}
-            </span>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Good day, {user?.name?.split(" ")[0] || "there"}
+            </div>
+            <h2 className="font-serif text-[2.7rem] font-normal leading-[1.05] tracking-[-0.04em] text-[#26352d] sm:text-6xl">
+              Your health,<br />
+              <span className="italic text-[#a65d45]">in your own rhythm.</span>
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">
+            <p className="mt-5 max-w-lg text-sm leading-6 text-[#68736a] sm:text-base">
               {todayCount === 4
-                ? "Your check-ins are complete for today. Keep up the steady routine."
-                : "A quick check-in helps you keep a clear picture of your day."}
+                ? `You have logged all four readings today, ${user?.name?.split(" ")[0] || "friend"}. Take a moment to review your day.`
+                : `Welcome back, ${user?.name?.split(" ")[0] || "friend"}. A simple record today can make tomorrow easier to understand.`}
             </p>
+            <button
+              onClick={openAddModal}
+              className="mt-6 inline-flex min-h-11 items-center rounded-md bg-[#526b52] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#405943] focus:outline-none focus:ring-2 focus:ring-[#526b52] focus:ring-offset-2"
+            >
+              Record a reading
+            </button>
           </div>
 
-          <div className="flex w-full flex-col gap-4 rounded-2xl border border-rose-100 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center md:w-auto md:min-w-[330px] md:flex-col md:items-stretch">
-            <div className="flex flex-1 items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-                <Activity className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-sm font-semibold text-slate-800">Today&apos;s check-ins</p>
-                  <p className="text-sm font-bold tabular-nums text-rose-600">{todayCount}<span className="font-medium text-slate-400"> / 4</span></p>
-                </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-rose-100" role="progressbar" aria-label="Today's readings logged" aria-valuenow={todayCount} aria-valuemin={0} aria-valuemax={4}>
-                  <div className="h-full rounded-full bg-gradient-to-r from-rose-500 to-pink-500 transition-all duration-500" style={{ width: `${(todayCount / 4) * 100}%` }} />
-                </div>
-              </div>
+          <div className="relative border-l border-[#d2d5c9] py-2 pl-6 sm:pl-8 lg:ml-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#78816f]">A note for today</p>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="font-serif text-7xl leading-none tracking-tight text-[#526b52]">{todayCount}</span>
+              <span className="pb-1 font-serif text-3xl text-[#9da394]">/ 4</span>
             </div>
-          <button
-            onClick={openAddModal}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-rose-200 transition hover:bg-rose-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Record a reading
-          </button>
+            <p className="mt-2 text-sm text-[#59665d]">readings recorded today</p>
+            <div className="mt-5 flex gap-2" aria-label={`${todayCount} of 4 readings logged`}>
+              {[0, 1, 2, 3].map((slot) => (
+                <span key={slot} className={`h-1.5 flex-1 rounded-full ${slot < todayCount ? "bg-[#526b52]" : "bg-[#d2d5c9]"}`} />
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-[#82877d]">
+              {todayCount === 4 ? "That’s your full day, recorded." : "No rush. Add readings as your day unfolds."}
+            </p>
+          </div>
         </div>
+      </section>
+
+      {/* Anatomical illustration paired with the actual meal-time log */}
+      <section className="grid overflow-hidden border-y border-[#d9d7ca] bg-[#faf9f5] lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="relative flex min-h-[360px] items-center justify-center overflow-hidden bg-[#e8e9df] px-8 py-6">
+          <div className="absolute left-6 top-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#78816f]">A whole-person view</div>
+          <div className="absolute bottom-5 left-6 max-w-[170px] text-[11px] leading-4 text-[#737c70]">A gentle reminder: your numbers are one part of your health story.</div>
+          <img
+            src="/images/glucose-body-map.png"
+            alt="Soft 3D anatomical illustration of a human figure, shown as a visual for the health journal"
+            className="relative mt-5 h-[300px] max-w-full object-contain drop-shadow-[0_18px_18px_rgba(67,80,62,0.14)] sm:h-[340px]"
+          />
+          <span aria-hidden="true" className="absolute right-[23%] top-[34%] h-2.5 w-2.5 rounded-full border-2 border-[#faf9f5] bg-[#bd7557] shadow" />
+          <span aria-hidden="true" className="absolute left-[28%] top-[46%] h-2.5 w-2.5 rounded-full border-2 border-[#faf9f5] bg-[#71836c] shadow" />
+        </div>
+        <div className="px-6 py-7 sm:px-8 lg:px-10 lg:py-9">
+          <div className="flex items-end justify-between border-b border-[#e4e0d5] pb-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#78816f]">Today’s log</p>
+              <h3 className="mt-1 font-serif text-3xl font-normal tracking-tight text-[#26352d]">Your day, at a glance</h3>
+            </div>
+            <Link to={`/reports?tab=daily&date=${today}`} className="text-xs font-semibold text-[#526b52] underline decoration-[#b6c0ae] underline-offset-4 hover:text-[#a65d45]">Daily view</Link>
+          </div>
+          <div className="mt-2 divide-y divide-[#e9e6dc]">
+            {TIME_SLOTS.map((slot, index) => {
+              const reading = todayReadings.find((item) => item.timeSlot === slot.value);
+              return (
+                <div key={slot.value} className="flex items-center gap-4 py-4">
+                  <span className="w-7 font-serif text-sm italic text-[#a2a396]">0{index + 1}</span>
+                  <span className="flex-1 text-sm font-medium text-[#59665d]">{slot.label}</span>
+                  {reading ? (
+                    <span className="font-serif text-2xl text-[#344b39]">{reading.glucoseValue}<span className="ml-1 font-sans text-[10px] text-[#85877e]">mg/dL</span></span>
+                  ) : (
+                    <span className="text-xs text-[#a2a396]">Not logged</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-2 border-l-2 border-[#c98263] pl-3 text-xs leading-5 text-[#85877e]">The illustration is for visual context; readings are organized by time of day.</p>
         </div>
       </section>
 
@@ -195,12 +235,13 @@ export default function Dashboard() {
 
       {/* Daily Stats Summary */}
       <ReportSummary statistics={dailyStats} title="Today's Blood Glucose Overview" />
+      <GlucoseUnitConverter initialValue={dailyStats?.average} />
 
       {/* Quick Navigation Cards to Reports */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-0 border-y border-[#d9d7ca] md:grid-cols-3">
         <Link
           to={`/reports?tab=daily&date=${today}`}
-          className="p-5 bg-white rounded-2xl border border-rose-100 shadow-sm hover:border-rose-300 hover:shadow-md transition-all group flex items-center justify-between"
+          className="group flex items-center justify-between border-b border-[#e4e0d5] bg-transparent p-5 transition-colors hover:bg-[#ebece4] focus:outline-none focus:ring-2 focus:ring-[#526b52] md:border-b-0 md:border-r"
         >
           <div>
             <h4 className="font-semibold text-slate-800 text-sm group-hover:text-rose-600 transition-colors">
@@ -213,7 +254,7 @@ export default function Dashboard() {
 
         <Link
           to={`/reports?tab=mtd&date=${today}`}
-          className="p-5 bg-white rounded-2xl border border-rose-100 shadow-sm hover:border-rose-300 hover:shadow-md transition-all group flex items-center justify-between"
+          className="group flex items-center justify-between border-b border-[#e4e0d5] bg-transparent p-5 transition-colors hover:bg-[#ebece4] focus:outline-none focus:ring-2 focus:ring-[#526b52] md:border-b-0 md:border-r"
         >
           <div>
             <h4 className="font-semibold text-slate-800 text-sm group-hover:text-rose-600 transition-colors">
@@ -226,7 +267,7 @@ export default function Dashboard() {
 
         <Link
           to={`/reports?tab=monthly&date=${today}`}
-          className="p-5 bg-white rounded-2xl border border-rose-100 shadow-sm hover:border-rose-300 hover:shadow-md transition-all group flex items-center justify-between"
+          className="group flex items-center justify-between bg-transparent p-5 transition-colors hover:bg-[#ebece4] focus:outline-none focus:ring-2 focus:ring-[#526b52]"
         >
           <div>
             <h4 className="font-semibold text-slate-800 text-sm group-hover:text-rose-600 transition-colors">
@@ -242,12 +283,12 @@ export default function Dashboard() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-slate-800">Recent Readings</h3>
-            <p className="text-xs text-slate-500">Your most recently logged entries</p>
+            <h3 className="font-serif text-2xl font-normal text-[#26352d]">Recent readings</h3>
+            <p className="text-xs text-[#85877e]">Your most recently logged entries</p>
           </div>
           <Link
             to="/readings"
-            className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center"
+            className="flex items-center text-xs font-semibold text-[#526b52] hover:text-[#a65d45]"
           >
             View All Readings
             <ArrowRight className="w-3.5 h-3.5 ml-1" />

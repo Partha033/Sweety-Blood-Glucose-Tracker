@@ -14,36 +14,36 @@ export default function ReportSummary({ statistics, title }) {
       label: "Highest Reading",
       value: highest !== null && highest !== undefined ? `${highest} mg/dL` : "--",
       icon: TrendingUp,
-      color: "text-rose-600",
-      bgColor: "bg-rose-50",
-      borderColor: "border-rose-100",
+      color: "text-[#a65d45]",
+      bgColor: "bg-[#f4e7df]",
+      borderColor: "border-[#e4e0d5]",
       description: highest !== null ? "Peak recorded level" : "No readings recorded",
     },
     {
       label: "Lowest Reading",
       value: lowest !== null && lowest !== undefined ? `${lowest} mg/dL` : "--",
       icon: TrendingDown,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-100",
+      color: "text-[#526b52]",
+      bgColor: "bg-[#e7eadf]",
+      borderColor: "border-[#e4e0d5]",
       description: lowest !== null ? "Minimum recorded level" : "No readings recorded",
     },
     {
       label: "Average Reading",
       value: average !== null && average !== undefined ? `${average} mg/dL` : "--",
       icon: Divide,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-100",
+      color: "text-[#77745e]",
+      bgColor: "bg-[#eeecdf]",
+      borderColor: "border-[#e4e0d5]",
       description: average !== null ? "Mean glucose value" : "No readings recorded",
     },
     {
       label: "Total Readings",
       value: count !== undefined ? String(count) : "0",
       icon: Activity,
-      color: "text-pink-600",
-      bgColor: "bg-pink-50",
-      borderColor: "border-pink-100",
+      color: "text-[#526b52]",
+      bgColor: "bg-[#e7eadf]",
+      borderColor: "border-[#e4e0d5]",
       description: `${count} log${count === 1 ? "" : "s"} in this period`,
     },
   ];
@@ -51,7 +51,7 @@ export default function ReportSummary({ statistics, title }) {
   return (
     <div className="space-y-4">
       {title && (
-        <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+        <h4 className="font-serif text-xl font-normal tracking-tight text-[#26352d]">
           {title}
         </h4>
       )}
@@ -61,20 +61,20 @@ export default function ReportSummary({ statistics, title }) {
           return (
             <div
               key={idx}
-              className={`p-5 bg-white rounded-2xl border ${card.borderColor} shadow-sm hover:shadow-md transition-shadow`}
+              className={`border-t-2 ${card.borderColor} bg-transparent px-1 py-4 transition-colors hover:bg-white/40 sm:px-3`}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#78816f]">
                   {card.label}
                 </span>
-                <div className={`p-2 rounded-xl ${card.bgColor} ${card.color}`}>
+                <div className={`rounded-full p-2 ${card.bgColor} ${card.color}`}>
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-slate-800 tracking-tight">
+              <div className="font-serif text-3xl font-normal tracking-tight text-[#26352d]">
                 {card.value}
               </div>
-              <p className="mt-1 text-xs text-slate-400">{card.description}</p>
+              <p className="mt-1 text-xs text-[#85877e]">{card.description}</p>
             </div>
           );
         })}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import Logo from "./Logo";
 import {
   Heart,
   LayoutDashboard,
@@ -30,19 +31,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
-          <Link to="/dashboard" className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 bg-rose-500 text-white rounded-xl flex items-center justify-center shadow-sm shadow-rose-200">
-              <Heart className="w-5 h-5 fill-white" />
-            </div>
-            <div>
-              <span className="text-lg font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
-                Sweety
-              </span>
-              <span className="hidden sm:inline-block ml-1.5 text-xs text-slate-400 font-medium">
-                Blood Glucose Tracker
-              </span>
-            </div>
-          </Link>
+          <Logo size="sm" showFormula={true} showText={true} />
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-1">
