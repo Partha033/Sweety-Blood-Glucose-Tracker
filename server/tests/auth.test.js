@@ -33,17 +33,17 @@ jest.mock("../src/config/database", () => {
         return { rows: [newUser] };
       }
 
-      // SELECT from users by email
-      if (lowerText.includes("from users") && lowerText.includes("email")) {
-        const email = params[0].toLowerCase();
-        const found = usersTable.filter((u) => u.email === email);
+      // SELECT from users by ID (must check where id first before where email)
+      if (lowerText.includes("where id = $1")) {
+        const id = params[0];
+        const found = usersTable.filter((u) => u.id === id);
         return { rows: found };
       }
 
-      // SELECT from users by ID
-      if (lowerText.includes("from users") && lowerText.includes("id = $1")) {
-        const id = params[0];
-        const found = usersTable.filter((u) => u.id === id);
+      // SELECT from users by email
+      if (lowerText.includes("where lower(email)")) {
+        const email = params[0].toLowerCase();
+        const found = usersTable.filter((u) => u.email === email);
         return { rows: found };
       }
 

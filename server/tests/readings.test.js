@@ -18,7 +18,7 @@ jest.mock("../src/config/database", () => {
       end: jest.fn().mockResolvedValue(true),
     },
     query: jest.fn(async (text, params) => {
-      const lower = text.toLowerCase();
+      const lower = text.toLowerCase().replace(/\s+/g, " ");
 
       // Auth middleware user lookup
       if (lower.includes("from users where id = $1")) {
@@ -40,7 +40,7 @@ jest.mock("../src/config/database", () => {
       }
 
       // Daily count check
-      if (lower.includes("select count(*)::int as count from readings where user_id = $1 and reading_date = $2")) {
+      if (lower.includes("count(*)::int as count")) {
         const [userId, date] = params;
         const matching = readings.filter(
           (r) => r.user_id === userId && r.reading_date === date
@@ -100,7 +100,7 @@ jest.mock("../src/config/database", () => {
       }
 
       // List readings total count
-      if (lower.includes("select count(*)::int as total from readings where user_id = $1")) {
+      if (lower.includes("count(*)::int as total")) {
         const userId = params[0];
         const userReadings = readings.filter((r) => r.user_id === userId);
         return { rows: [{ total: userReadings.length }] };

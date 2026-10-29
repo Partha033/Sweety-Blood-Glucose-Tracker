@@ -84,7 +84,7 @@ jest.mock("../src/config/database", () => {
       end: jest.fn().mockResolvedValue(true),
     },
     query: jest.fn(async (text, params) => {
-      const lower = text.toLowerCase();
+      const lower = text.toLowerCase().replace(/\s+/g, " ");
 
       // Auth middleware lookup
       if (lower.includes("from users where id = $1")) {
@@ -92,8 +92,8 @@ jest.mock("../src/config/database", () => {
         return { rows: user ? [user] : [] };
       }
 
-      // Aggregate query for Daily (user_id = $1 and reading_date = $2)
-      if (lower.includes("select \n      count(*)::int as count") || lower.includes("max(glucose_value)")) {
+      // Aggregate query for Daily, MTD, or Monthly
+      if (lower.includes("count(*)::int as count") || lower.includes("max(glucose_value)")) {
         const userId = params[0];
         let filtered;
 
