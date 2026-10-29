@@ -28,6 +28,7 @@ pnpm-debug.log*
 
 # Database & Docker storage
 pgdata/
+data_pg/
 *.sqlite
 *.db
 
