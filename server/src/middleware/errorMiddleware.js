@@ -40,6 +40,12 @@ function errorHandler(err, req, res, next) {
 
   // Hide internal server error details in production
   const isProduction = process.env.NODE_ENV === "production";
+  if (statusCode >= 500) {
+    console.error(`[API] ${req.method} ${req.originalUrl} failed`, {
+      code: err.code || "UNKNOWN",
+      message: err.message,
+    });
+  }
   if (statusCode === 500 && isProduction) {
     message = "Internal server error. Please try again later.";
   }

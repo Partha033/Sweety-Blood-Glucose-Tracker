@@ -9,6 +9,7 @@ const readingRoutes = require("./routes/readingRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 const ApiError = require("./utils/ApiError");
+const { query: queryDatabase, isDatabaseConfigured } = require("./config/database");
 
 const app = express();
 
@@ -57,20 +58,34 @@ app.get("/", (req, res) => {
 });
 
 // Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "Sweety Blood Glucose Tracker API",
-    timestamp: new Date().toISOString(),
-  });
+app.get("/api/health", async (req, res) => {
+  try {
+    if (!isDatabaseConfigured) {
+      throw new Error("DATABASE_URL or POSTGRES_URL is not configured.");
+    }
+    await queryDatabase("SELECT 1");
+    res.status(200).json({
+      status: "ok",
+      service: "Sweety Blood Glucose Tracker API",
+      database: "connected",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[Health] Database readiness check failed:", err.message);
+    res.status(503).json({
+      status: "error",
+      service: "Sweety Blood Glucose Tracker API",
+      database: "unavailable",
+      reason: isDatabaseConfigured ? "connection_failed" : "database_url_missing",
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // Auto-initialize schema if new cloud database is connected
-app.use(async (req, res, next) => {
-  if (req.path.startsWith("/api/")) {
-    await autoInitDb().catch(() => {});
-  }
-  next();
+app.use((req, res, next) => {
+  if (!req.path.startsWith("/api/")) return next();
+  autoInitDb().then(() => next()).catch(next);
 });
 
 // API Routes

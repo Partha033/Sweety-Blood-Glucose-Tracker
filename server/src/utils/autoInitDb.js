@@ -54,7 +54,8 @@ async function autoInitDb() {
 
       initialized = true;
     } catch (err) {
-      console.warn("[AutoInit] Database check notice:", err.message);
+      console.error("[AutoInit] Database initialization failed:", err.message);
+      throw err;
     } finally {
       initializing = null;
     }

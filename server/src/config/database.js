@@ -6,13 +6,17 @@ dotenv.config();
 
 const isProduction = process.env.NODE_ENV === "production";
 const isTest = process.env.NODE_ENV === "test";
+const configuredConnectionString =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.POSTGRES_PRISMA_URL;
 
 const connectionString = isTest
   ? process.env.TEST_DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/sweety_test_db"
-  : process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.POSTGRES_PRISMA_URL ||
-    `postgresql://${process.env.DB_USER || "postgres"}:${encodeURIComponent(process.env.DB_PASSWORD || "postgres")}@${process.env.DB_HOST || "localhost"}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || "sweety_db"}`;
+  : configuredConnectionString ||
+    (isProduction
+      ? undefined
+      : `postgresql://${process.env.DB_USER || "postgres"}:${encodeURIComponent(process.env.DB_PASSWORD || "postgres")}@${process.env.DB_HOST || "localhost"}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || "sweety_db"}`);
 
 const isCloudDatabase = Boolean(
   connectionString &&
@@ -37,5 +41,11 @@ pool.on("error", (err) => {
 
 module.exports = {
   pool,
-  query: (text, params) => pool.query(text, params),
+  isDatabaseConfigured: isTest || Boolean(configuredConnectionString) || !isProduction,
+  query: (text, params) => {
+    if (isProduction && !configuredConnectionString) {
+      return Promise.reject(new Error("DATABASE_URL or POSTGRES_URL must be configured in production."));
+    }
+    return pool.query(text, params);
+  },
 };
