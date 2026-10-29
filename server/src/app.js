@@ -85,6 +85,8 @@ app.get("/api/health", async (req, res) => {
 // Auto-initialize schema if new cloud database is connected
 app.use((req, res, next) => {
   if (!req.path.startsWith("/api/")) return next();
+  const { isInMemory } = require("./config/database");
+  if (isInMemory) return next();
   autoInitDb().then(() => next()).catch(next);
 });
 
