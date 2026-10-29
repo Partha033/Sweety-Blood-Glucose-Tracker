@@ -1,7 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")
+      ? "https://server-sigma-gilt-28.vercel.app/api"
+      : "http://localhost:5000/api"),
   withCredentials: true, // Send and receive HttpOnly cookies
   headers: {
     "Content-Type": "application/json",
