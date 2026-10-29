@@ -1,3 +1,4 @@
+const { autoInitDb } = require("./utils/autoInitDb");
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -62,6 +63,14 @@ app.get("/api/health", (req, res) => {
     service: "Sweety Blood Glucose Tracker API",
     timestamp: new Date().toISOString(),
   });
+});
+
+// Auto-initialize schema if new cloud database is connected
+app.use(async (req, res, next) => {
+  if (req.path.startsWith("/api/")) {
+    await autoInitDb().catch(() => {});
+  }
+  next();
 });
 
 // API Routes
