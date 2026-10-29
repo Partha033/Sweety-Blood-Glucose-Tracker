@@ -127,33 +127,50 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header Greeting & Quick Action */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-rose-500/10 via-pink-500/5 to-purple-500/10 p-6 sm:p-8 rounded-3xl border border-rose-100">
-        <div>
-          <span className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-rose-600 bg-rose-100/70 px-3 py-1 rounded-full mb-2">
-            <Calendar className="w-3.5 h-3.5 mr-1.5" />
-            {formatDateDisplay(today)}
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Hello, {user?.name || "Patient"}! 👋
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            {todayCount === 4
-              ? "Great job! You have logged all 4 readings for today."
-              : `You have recorded ${todayCount} of 4 readings today.`}
-          </p>
-        </div>
+      {/* Daily check-in and primary action */}
+      <section className="relative overflow-hidden rounded-[2rem] border border-rose-100 bg-white shadow-sm">
+        <div className="absolute inset-y-0 right-0 hidden w-2/5 bg-gradient-to-br from-rose-50 via-pink-50 to-violet-50 md:block" />
+        <div className="relative flex flex-col gap-7 p-6 sm:p-8 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-xl">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-semibold tracking-wide text-rose-700">
+              <Calendar className="h-3.5 w-3.5" />
+              {formatDateDisplay(today)}
+            </span>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              Good day, {user?.name?.split(" ")[0] || "there"}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">
+              {todayCount === 4
+                ? "Your check-ins are complete for today. Keep up the steady routine."
+                : "A quick check-in helps you keep a clear picture of your day."}
+            </p>
+          </div>
 
-        <div className="flex items-center space-x-3">
+          <div className="flex w-full flex-col gap-4 rounded-2xl border border-rose-100 bg-white/90 p-4 shadow-sm sm:flex-row sm:items-center md:w-auto md:min-w-[330px] md:flex-col md:items-stretch">
+            <div className="flex flex-1 items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
+                <Activity className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-800">Today&apos;s check-ins</p>
+                  <p className="text-sm font-bold tabular-nums text-rose-600">{todayCount}<span className="font-medium text-slate-400"> / 4</span></p>
+                </div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-rose-100" role="progressbar" aria-label="Today's readings logged" aria-valuenow={todayCount} aria-valuemin={0} aria-valuemax={4}>
+                  <div className="h-full rounded-full bg-gradient-to-r from-rose-500 to-pink-500 transition-all duration-500" style={{ width: `${(todayCount / 4) * 100}%` }} />
+                </div>
+              </div>
+            </div>
           <button
             onClick={openAddModal}
-            className="inline-flex items-center px-5 py-3 bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white font-semibold text-sm rounded-2xl shadow-sm shadow-rose-300 hover:shadow-md transition-all"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-rose-200 transition hover:bg-rose-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Quick Add Reading
+            Record a reading
           </button>
         </div>
-      </div>
+        </div>
+      </section>
 
       {/* Feedback Messages */}
       {successMessage && (

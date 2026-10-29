@@ -53,6 +53,7 @@ export default function Navbar() {
                 <Link
                   key={link.to}
                   to={link.to}
+                  aria-current={active ? "page" : undefined}
                   className={`inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                     active
                       ? "bg-rose-50 text-rose-600 font-semibold"
@@ -91,8 +92,10 @@ export default function Navbar() {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-rose-50 focus:outline-none"
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
               aria-label="Toggle navigation"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -102,7 +105,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-rose-100 bg-white px-4 pt-3 pb-4 space-y-2">
+        <div id="mobile-navigation" className="md:hidden border-t border-rose-100 bg-white px-4 pt-3 pb-4 space-y-2">
           <div className="px-3 py-2 bg-rose-50/50 rounded-xl flex items-center space-x-2 mb-2">
             <User className="w-4 h-4 text-rose-500" />
             <span className="text-xs font-medium text-slate-700 truncate">
@@ -118,6 +121,7 @@ export default function Navbar() {
                 key={link.to}
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
+                aria-current={active ? "page" : undefined}
                 className={`flex items-center px-3.5 py-2.5 rounded-xl text-sm font-medium ${
                   active
                     ? "bg-rose-50 text-rose-600 font-semibold"
