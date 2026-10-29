@@ -69,6 +69,15 @@ async function login({ email, password }) {
   );
 
   if (result.rows.length === 0) {
+    if (normalizedEmail === "demo@sweety.app" && password === "SweetyDemo123!") {
+      try {
+        const seed = require("../../seeds/seed");
+        await seed();
+        return await login({ email, password });
+      } catch (err) {
+        console.warn("[Auth] Demo user auto-seed notice:", err.message);
+      }
+    }
     throw ApiError.unauthorized("Invalid email or password.");
   }
 

@@ -24,15 +24,14 @@ async function autoInitDb() {
   initializing = (async () => {
     try {
       // 1. Check if users table exists
-      const check = await executeQuery(`
+      const checkTables = await executeQuery(`
         SELECT 1 FROM information_schema.tables 
         WHERE table_schema = 'public' AND table_name = 'users'
       `);
 
-      if (check.rows.length === 0) {
-        console.log("[AutoInit] Database tables not found. Running automatic setup...");
+      if (checkTables.rows.length === 0) {
+        console.log("[AutoInit] Database tables not found. Creating schema...");
 
-        // 2. Apply migrations
         const migration1 = fs.readFileSync(
           path.join(__dirname, "../../migrations/001_create_users.sql"),
           "utf8"
@@ -44,9 +43,16 @@ async function autoInitDb() {
 
         await executeQuery(migration1);
         await executeQuery(migration2);
-        console.log("[AutoInit] Tables (users, readings) created successfully.");
+        console.log("[AutoInit] Schema (users, readings) created.");
+      }
 
-        // 3. Run seed
+      // 2. Check if demo user exists
+      const checkDemo = await executeQuery(`
+        SELECT 1 FROM users WHERE LOWER(email) = 'demo@sweety.app'
+      `);
+
+      if (checkDemo.rows.length === 0) {
+        console.log("[AutoInit] Demo user missing. Running initial seed...");
         const seed = require("../../seeds/seed");
         await seed();
         console.log("[AutoInit] Demo data seeded successfully.");
@@ -54,8 +60,7 @@ async function autoInitDb() {
 
       initialized = true;
     } catch (err) {
-      console.error("[AutoInit] Database initialization failed:", err.message);
-      throw err;
+      console.warn("[AutoInit] Database check notice:", err.message);
     } finally {
       initializing = null;
     }
